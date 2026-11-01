@@ -102,13 +102,13 @@ export default function Features() {
             desc: "Cinematic color presets, optical flow slow-motion, real-time chromatic aberration, 35mm grain, and blend modes.",
             preview: (
               <div className="grid grid-cols-3 gap-1.5 text-center text-[10px] font-mono">
-                <div className="py-1.5 rounded bg-gradient-to-tr from-cyan-900 to-blue-700 text-white font-semibold">
+                <div className="py-1.5 rounded bg-linear-to-tr from-cyan-900 to-blue-700 text-white font-semibold">
                   WASH
                 </div>
-                <div className="py-1.5 rounded bg-gradient-to-tr from-amber-700 to-teal-800 text-white font-semibold">
+                <div className="py-1.5 rounded bg-linear-to-tr from-amber-700 to-teal-800 text-white font-semibold">
                   TEAL
                 </div>
-                <div className="py-1.5 rounded bg-gradient-to-tr from-slate-900 to-zinc-700 text-white font-semibold">
+                <div className="py-1.5 rounded bg-linear-to-tr from-slate-900 to-zinc-700 text-white font-semibold">
                   NOIR
                 </div>
               </div>
@@ -127,7 +127,7 @@ export default function Features() {
                   </span>
                 </div>
                 <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 w-[78%]" />
+                  <div className="h-full bg-linear-to-r from-cyan-400 to-blue-500 w-[78%]" />
                 </div>
                 <div className="text-[9px] text-slate-400 font-mono">
                   00:28 Remaining • Client GPU Engine

@@ -24,7 +24,7 @@ export default function HowItWorks() {
         </div>
 
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          <div className="hidden md:block absolute top-10 left-[16.66%] right-[16.66%] h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent" />
+          <div className="hidden md:block absolute top-10 left-[16.66%] right-[16.66%] h-px bg-linear-to-r from-transparent via-cyan-500/30 to-transparent" />
 
           {[
             {

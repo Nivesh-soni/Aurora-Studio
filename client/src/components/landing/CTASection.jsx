@@ -35,7 +35,7 @@ export default function CTASection() {
           transition={{ duration: 0.7 }}
           className="relative overflow-hidden rounded-3xl border border-cyan-500/20 bg-[#0c0f17] p-8 sm:p-14 text-center shadow-2xl shadow-cyan-500/5"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-blue-500/10 pointer-events-none" />
+          <div className="absolute inset-0 bg-linear-to-br from-cyan-500/10 via-transparent to-blue-500/10 pointer-events-none" />
 
           <div className="relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold tracking-wider uppercase">
