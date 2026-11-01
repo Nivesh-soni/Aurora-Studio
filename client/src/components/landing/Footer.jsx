@@ -1,8 +1,4 @@
 import {
-  Radio,
-  //   Github,
-  //   Instagram,
-  //   Youtube,
   ArrowUpRight,
   Sparkles,
   Heart,
@@ -36,8 +32,8 @@ export default function Footer() {
       className="relative mt-20 border-t border-white/5 bg-[#07090e] overflow-hidden"
     >
       {/* Ambient Background */}
-      <div className="absolute top-0 left-1/4 w-96 h-64 bg-cyan-500/[0.04] blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-96 h-64 bg-violet-500/[0.04] blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-96 h-64 bg-cyan-500/4 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-96 h-64 bg-violet-500/4 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer */}
@@ -45,7 +41,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-5">
             <a href="#home" className="inline-flex items-center gap-3 group">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-500 p-[1px] shadow-lg shadow-cyan-500/20">
+              <div className="w-8 h-8 rounded-lg bg-linear-to-tr from-cyan-500 to-indigo-500 p-px shadow-lg shadow-cyan-500/20">
                 <div className="w-full h-full bg-[#07090e] rounded-[7px] flex items-center justify-center">
                   <img
                     src="Logo-without-bg.png"
@@ -66,7 +62,7 @@ export default function Footer() {
               built for the web.
             </p>
 
-            <div className="mt-7 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/5">
+            <div className="mt-7 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white/3 border border-white/5">
               <Sparkles className="w-4 h-4 text-cyan-400" />
               <span className="text-xs text-slate-300">
                 Made for creators, by creators.
@@ -74,7 +70,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Product Links */}
           <div className="lg:col-span-2">
             <h3 className="text-sm font-bold text-white mb-6">Product</h3>
 
@@ -142,25 +137,25 @@ export default function Footer() {
             <a
               href="#"
               aria-label="GitHub"
-              className="w-9 h-9 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:border-cyan-500/30 hover:bg-cyan-500/10 transition-all"
+              className="w-9 h-9 rounded-lg bg-white/3 border border-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:border-cyan-500/30 hover:bg-cyan-500/10 transition-all"
             >
-              <i class="fa-brands fa-github"></i>
+              <i className="fa-brands fa-github"></i>
             </a>
 
             <a
               href="#"
               aria-label="Instagram"
-              className="w-9 h-9 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:border-cyan-500/30 hover:bg-cyan-500/10 transition-all"
+              className="w-9 h-9 rounded-lg bg-white/3 border border-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:border-cyan-500/30 hover:bg-cyan-500/10 transition-all"
             >
-              <i class="fa-brands fa-instagram"></i>
+              <i className="fa-brands fa-instagram"></i>
             </a>
 
             <a
               href="#"
               aria-label="YouTube"
-              className="w-9 h-9 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:border-cyan-500/30 hover:bg-cyan-500/10 transition-all"
+              className="w-9 h-9 rounded-lg bg-white/3 border border-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:border-cyan-500/30 hover:bg-cyan-500/10 transition-all"
             >
-              <i class="fa-brands fa-youtube"></i>
+              <i className="fa-brands fa-youtube"></i>
             </a>
           </div>
 

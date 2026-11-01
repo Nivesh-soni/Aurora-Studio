@@ -1,4 +1,4 @@
-
+import { SignUpButton } from "@clerk/clerk-react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -79,7 +79,7 @@ export default function Hero() {
           className="mt-8 text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white max-w-4xl"
         >
           Your Vision. Your Story. <br />
-          <span className="bg-gradient-to-r from-indigo-400 via-cyan-300 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(34,211,238,0.25)]">
+          <span className="bg-linear-to-r from-indigo-400 via-cyan-300 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(34,211,238,0.25)]">
             Your Studio.
           </span>
         </motion.h1>
@@ -90,8 +90,8 @@ export default function Hero() {
           className="mt-6 text-base sm:text-lg text-slate-400 max-w-2xl leading-relaxed"
         >
           The next-generation browser-based video editing platform combining
-          desktop-class multi-track timeline precision with the fluid agility
-          of modern cloud creative tools. No downloads, no lag.
+          desktop-class multi-track timeline precision with the fluid agility of
+          modern cloud creative tools. No downloads, no lag.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -100,27 +100,30 @@ export default function Hero() {
           className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
         >
           {/* Primary Pulsing CTA */}
-          <motion.button
-            variants={pulseGlow}
-            initial="initial"
-            animate="animate"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-medium text-sm bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 text-white shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all group"
-          >
-            <span>Start Creating Free</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </motion.button>
+          <SignUpButton mode="modal">
+            <motion.button
+              variants={pulseGlow}
+              initial="initial"
+              animate="animate"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-medium text-sm bg-linear-to-r from-cyan-500 via-blue-500 to-indigo-500 text-white shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all group"
+            >
+              <span>Start Creating Free</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </motion.button>
+          </SignUpButton>
 
           {/* Secondary CTA */}
-          <motion.button
+          <motion.a
+            href="#showcase"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-medium text-sm bg-slate-900/80 border border-white/10 hover:border-slate-600 hover:bg-slate-800/80 text-slate-200 transition-all"
           >
             <Compass className="w-4 h-4 text-cyan-400" />
-            <span>Explore the Studio</span>
-          </motion.button>
+            <>Explore the Studio</>
+          </motion.a>
         </motion.div>
 
         {/* Social Proof & Metrics */}
@@ -138,7 +141,7 @@ export default function Hero() {
             ].map(({ icon: Icon, label }) => (
               <div
                 key={label}
-                className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/5 hover:border-white/10 hover:bg-white/[0.04] transition-colors"
+                className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/2 border border-white/5 hover:border-white/10 hover:bg-white/4 transition-colors"
               >
                 <Icon className="w-3.5 h-3.5 text-cyan-400" />
                 <span>{label}</span>

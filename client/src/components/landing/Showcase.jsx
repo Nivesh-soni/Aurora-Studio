@@ -86,7 +86,7 @@ export default function Showcase() {
             <div className="text-xs text-slate-400 bg-white/5 px-2.5 py-1 rounded border border-white/5 font-mono">
               Zoom 100%
             </div>
-            <button className="px-3 py-1 rounded bg-gradient-to-r from-cyan-500 to-blue-600 text-xs font-medium text-white shadow-sm flex items-center gap-1.5">
+            <button className="px-3 py-1 rounded bg-linear-to-r from-cyan-500 to-blue-600 text-xs font-medium text-white shadow-sm flex items-center gap-1.5">
               <Download className="w-3.5 h-3.5" />
               Export MP4
             </button>
@@ -94,7 +94,7 @@ export default function Showcase() {
         </div>
 
         {/* Three Column Studio Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[380px] border-b border-white/5">
+        <div className="grid grid-cols-1 lg:grid-cols-12 min-h-95 border-b border-white/5">
           {/* Left Bin / Assets (3 cols) */}
           <div className="lg:col-span-3 border-r border-white/5 p-3 flex flex-col justify-between bg-[#0a0c12]">
             <div>
@@ -140,7 +140,7 @@ export default function Showcase() {
                     className="group cursor-pointer rounded-lg bg-slate-900/60 border border-white/5 p-1.5 hover:border-cyan-500/40 transition-all"
                   >
                     <div
-                      className={`h-16 rounded bg-gradient-to-br ${item.grad} relative flex items-center justify-center overflow-hidden`}
+                      className={`h-16 rounded bg-linear-to-br ${item.grad} relative flex items-center justify-center overflow-hidden`}
                     >
                       <Film className="w-4 h-4 text-white/40 group-hover:scale-110 transition-transform" />
                       <span className="absolute bottom-1 right-1 text-[9px] font-mono px-1 rounded bg-black/60 text-slate-300">
@@ -156,7 +156,7 @@ export default function Showcase() {
             </div>
 
             {/* Drop area */}
-            <div className="mt-3 border border-dashed border-white/10 rounded-lg p-3 text-center bg-white/[0.01]">
+            <div className="mt-3 border border-dashed border-white/10 rounded-lg p-3 text-center bg-white/1">
               <UploadCloud className="w-4 h-4 mx-auto text-slate-400 mb-1" />
               <p className="text-[10px] text-slate-300">
                 Drop Media Clips Here
@@ -182,11 +182,11 @@ export default function Showcase() {
             {/* Monitor Screen Frame */}
             <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 flex items-center justify-center shadow-inner group">
               {/* Aurora Artwork Canvas */}
-              <div className="absolute inset-0 bg-gradient-to-t from-indigo-950 via-slate-950 to-slate-900">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-400/20 via-indigo-500/10 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-indigo-950 via-slate-950 to-slate-900">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-cyan-400/20 via-indigo-500/10 to-transparent" />
 
                 {/* Glowing Mountain & Aurora Silhouette simulation */}
-                <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-black via-slate-950/80 to-transparent" />
+                <div className="absolute bottom-0 inset-x-0 h-28 bg-linear-to-t from-black via-slate-950/80 to-transparent" />
 
                 <div className="absolute top-1/4 left-1/2 -translate-x-1/2 text-center pointer-events-none">
                   <span className="text-[9px] uppercase tracking-widest text-cyan-300 font-mono block">
@@ -263,19 +263,19 @@ export default function Showcase() {
                 Transform
               </p>
               <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
-                <div className="p-1.5 rounded bg-white/[0.02] border border-white/5 flex justify-between">
+                <div className="p-1.5 rounded bg-white/2 border border-white/5 flex justify-between">
                   <span className="text-slate-400">Scale</span>
                   <span className="text-cyan-400 font-semibold">100.0%</span>
                 </div>
-                <div className="p-1.5 rounded bg-white/[0.02] border border-white/5 flex justify-between">
+                <div className="p-1.5 rounded bg-white/2 border border-white/5 flex justify-between">
                   <span className="text-slate-400">Rotation</span>
                   <span className="text-slate-200">0.0°</span>
                 </div>
-                <div className="p-1.5 rounded bg-white/[0.02] border border-white/5 flex justify-between">
+                <div className="p-1.5 rounded bg-white/2 border border-white/5 flex justify-between">
                   <span className="text-slate-400">Pos X</span>
                   <span className="text-slate-200">0 px</span>
                 </div>
-                <div className="p-1.5 rounded bg-white/[0.02] border border-white/5 flex justify-between">
+                <div className="p-1.5 rounded bg-white/2 border border-white/5 flex justify-between">
                   <span className="text-slate-400">Pos Y</span>
                   <span className="text-slate-200">0 px</span>
                 </div>
@@ -368,8 +368,8 @@ export default function Showcase() {
           {/* Timeline Tracks */}
           <div className="mt-3 space-y-2 relative">
             {/* Playhead marker line */}
-            <div className="absolute top-0 bottom-0 left-[38%] w-[2px] bg-cyan-400 z-20 pointer-events-none shadow-[0_0_10px_#22d3ee]">
-              <div className="w-3 h-3 bg-cyan-400 -translate-x-[5px] rotate-45 rounded-sm" />
+            <div className="absolute top-0 bottom-0 left-[38%] w-0.5 bg-cyan-400 z-20 pointer-events-none shadow-[0_0_10px_#22d3ee]">
+              <div className="w-3 h-3 bg-cyan-400 -translate-x-1.25 rotate-45 rounded-sm" />
             </div>
 
             {/* Track T1 (Text/FX) */}
@@ -405,13 +405,13 @@ export default function Showcase() {
                 V1 👁
               </span>
               <div className="flex-1 h-8 rounded bg-slate-900/80 border border-white/5 flex items-center px-1 overflow-hidden gap-1">
-                <div className="w-[35%] h-6 rounded bg-gradient-to-r from-cyan-950 to-blue-950 border border-cyan-500/50 text-[10px] text-cyan-200 px-2 flex items-center font-mono truncate">
+                <div className="w-[35%] h-6 rounded bg-linear-to-r from-cyan-950 to-blue-950 border border-cyan-500/50 text-[10px] text-cyan-200 px-2 flex items-center font-mono truncate">
                   Cyber_Rain_Master.mp4{" "}
                   <span className="text-[9px] text-slate-400 ml-1">
                     4K 60FPS
                   </span>
                 </div>
-                <div className="w-[45%] h-6 rounded bg-gradient-to-r from-blue-950 to-indigo-950 border border-cyan-400/80 text-[10px] text-cyan-100 px-2 flex items-center font-mono truncate shadow-sm shadow-cyan-500/30">
+                <div className="w-[45%] h-6 rounded bg-linear-to-r from-blue-950 to-indigo-950 border border-cyan-400/80 text-[10px] text-cyan-100 px-2 flex items-center font-mono truncate shadow-sm shadow-cyan-500/30">
                   Aurora_Peak_Hero.mov{" "}
                   <span className="text-[9px] text-cyan-300 ml-1">Snapped</span>
                 </div>
