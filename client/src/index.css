@@ -1,1 +1,20 @@
 @import 'tailwindcss';
+
+/* Aurora polish: neutral-gray contrast, focus, scrollbars, motion, skeletons. Brand colors untouched. */
+@theme {
+  --color-slate-500: #8a99b0;
+  --color-slate-600: #71819a;
+}
+:root { color-scheme: dark; }
+:focus-visible { outline: 2px solid rgb(34 211 238 / 0.7); outline-offset: 2px; }
+input:focus-visible, textarea:focus-visible, select:focus-visible { outline: none; }
+* { scrollbar-width: thin; scrollbar-color: rgb(255 255 255 / 0.14) transparent; }
+.aurora-skeleton {
+  background: linear-gradient(100deg, rgb(255 255 255 / 0.03) 30%, rgb(34 211 238 / 0.07) 50%, rgb(255 255 255 / 0.03) 70%) #0d1017;
+  background-size: 200% 100%;
+  animation: aurora-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes aurora-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

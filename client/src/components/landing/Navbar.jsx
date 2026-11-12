@@ -1,25 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { SignInButton, SignUpButton, useUser } from '@clerk/clerk-react';
-import { Menu, X } from "lucide-react";
-import useUserStore from "../../store/userStore.js";
+import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
+import { useNavigate } from "react-router-dom";
+import { LogIn, Menu, X, LayoutDashboard } from "lucide-react";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isLoaded, isSignedIn, user: clerkUser } = useUser();
-  const { syncUserWithBackend, clearUser } = useUserStore();
-
-  useEffect(() => {
-    if (isLoaded && isSignedIn && clerkUser) {
-      syncUserWithBackend(clerkUser);
-    } else if (isLoaded && !isSignedIn) {
-      clearUser();
-    }
-  }, [isLoaded, isSignedIn, clerkUser, syncUserWithBackend, clearUser]);
+  const navigate = useNavigate();
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#07090e]/80 border-b border-white/5 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+
         {/* Logo */}
         <a href="#" className="flex items-center gap-2.5 group">
           <div className="w-8 h-8 rounded-lg bg-linear-to-tr from-cyan-500 to-indigo-500 p-px shadow-lg shadow-cyan-500/20">
@@ -27,7 +19,7 @@ export default function Navbar() {
               <img
                 src="Logo-without-bg.png"
                 className="text-cyan-400 group-hover:rotate-6 transition-transform"
-                alt=""
+                alt="Aurora Studio Logo"
               />
             </div>
           </div>
@@ -51,39 +43,51 @@ export default function Navbar() {
 
         {/* Actions (Desktop) */}
         <div className="hidden md:flex items-center gap-4">
-          {/* FIXED: Removed <a> tag wrapper from SignInButton */}
-          <SignInButton mode="modal" theme="Dark">
-            <button className="text-sm text-slate-300 hover:text-white transition-colors px-3 py-2 cursor-pointer">
-              Sign In
-            </button>
-          </SignInButton>
+          <SignedOut>
+            {/* Sign In Button (Only when logged out) */}
+            <SignInButton mode="modal">
+              <button className="text-sm text-slate-300 hover:text-white transition-colors px-3 py-2 cursor-pointer">
+                Sign In
+              </button>
+            </SignInButton>
 
-          {/* FIXED: SignUpButton now fully controls the styled button inside */}
-          <SignUpButton mode="modal">
+            {/* Get Started Button (Only when logged out) */}
+            <SignUpButton mode="modal">
+              <motion.button
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-linear-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/25 transition-all cursor-pointer"
+              >
+                Get Started
+                <LogIn size={16} />
+              </motion.button>
+            </SignUpButton>
+          </SignedOut>
+
+          <SignedIn>
+            {/* Dashboard Navigation Button (Only when signed in) */}
             <motion.button
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.98 }}
-              className="relative inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-linear-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/25 transition-all cursor-pointer"
+              onClick={() => navigate("/dashboard")}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700/80 shadow-md transition-all cursor-pointer"
             >
-              Get Started
-              <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-xs">
-                ✦
-              </div>
+              <LayoutDashboard size={16} className="text-cyan-400" />
+              Dashboard
             </motion.button>
-          </SignUpButton>
+
+            {/* Clerk User Profile Avatar */}
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
         </div>
 
         {/* Mobile hamburger */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 text-slate-400 hover:text-white focus:outline-none"
+          className="md:hidden p-2 text-slate-400 hover:text-white focus:outline-none cursor-pointer"
           aria-label="Toggle navigation menu"
         >
-          {mobileMenuOpen ? (
-            <X className="w-6 h-6" />
-          ) : (
-            <Menu className="w-6 h-6" />
-          )}
+          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
@@ -110,25 +114,40 @@ export default function Navbar() {
               ))}
             </nav>
             
-            {/* FIXED: Connected Clerk Buttons to Mobile Layout Buttons */}
-            <div className="pt-4 border-t border-white/10 flex flex-col gap-3">
-              <SignInButton mode="modal">
-                <button 
-                  onClick={() => setMobileMenuOpen(false)} 
-                  className="w-full text-center py-2.5 text-sm text-slate-300 hover:text-white cursor-pointer"
-                >
-                  Sign In
-                </button>
-              </SignInButton>
+            {/* Mobile Actions based on Auth state */}
+            <div className="pt-4 border-t border-white/15 flex flex-col gap-3">
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-center py-2.5 text-sm text-slate-300 hover:text-white cursor-pointer"
+                  >
+                    Sign In
+                  </button>
+                </SignInButton>
 
-              <SignUpButton mode="modal">
-                <button 
-                  onClick={() => setMobileMenuOpen(false)} 
-                  className="w-full py-2.5 rounded-lg text-sm font-medium bg-linear-to-r from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/25 cursor-pointer"
+                <SignUpButton mode="modal">
+                  <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full py-2.5 rounded-lg text-sm font-medium bg-linear-to-r from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/25 cursor-pointer"
+                  >
+                    Get Started
+                  </button>
+                </SignUpButton>
+              </SignedOut>
+
+              <SignedIn>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigate("/dashboard");
+                  }}
+                  className="w-full py-2.5 rounded-lg text-sm font-medium bg-zinc-800 text-white border border-zinc-700 text-center flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  Get Started
+                  <LayoutDashboard size={16} className="text-cyan-400" />
+                  Go to Dashboard
                 </button>
-              </SignUpButton>
+              </SignedIn>
             </div>
           </motion.div>
         )}

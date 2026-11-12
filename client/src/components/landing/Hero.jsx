@@ -67,7 +67,7 @@ export default function Hero() {
             </span>
             <span className="text-slate-500">—</span>
             <span className="hidden sm:inline">
-              Zero installation, instant 4K rendering
+              Cloud-based editing and 4K exports
             </span>
             <ArrowRight className="w-3.5 h-3.5 text-cyan-400" />
           </motion.div>
@@ -89,9 +89,9 @@ export default function Hero() {
           variants={fadeInUp}
           className="mt-6 text-base sm:text-lg text-slate-400 max-w-2xl leading-relaxed"
         >
-          The next-generation browser-based video editing platform combining
-          desktop-class multi-track timeline precision with the fluid agility of
-          modern cloud creative tools. No downloads, no lag.
+          Bring your footage, images, and audio into one clear workspace. Edit
+          on a multi-track timeline, save projects to your account, and render
+          your finished video as an MP4.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -107,7 +107,7 @@ export default function Hero() {
               animate="animate"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-medium text-sm bg-linear-to-r from-cyan-500 via-blue-500 to-indigo-500 text-white shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all group"
+              className="cursor-pointer w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-medium text-sm bg-linear-to-r from-cyan-500 via-blue-500 to-indigo-500 text-white shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all group"
             >
               <span>Start Creating Free</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -129,15 +129,14 @@ export default function Hero() {
         {/* Social Proof & Metrics */}
         <motion.div variants={fadeInUp} className="mt-14 w-full max-w-3xl">
           <p className="text-[11px] font-semibold tracking-widest uppercase text-slate-400">
-            Trusted by 140,000+ creators, filmmakers, and digital studios
-            worldwide
+            Everything you need to shape your next video
           </p>
           <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-slate-300">
             {[
               { icon: MonitorPlay, label: "4K 60FPS Support" },
-              { icon: Cpu, label: "WebGPU Accelerated" },
-              { icon: CheckCircle2, label: "Zero Watermarks" },
-              { icon: HardDrive, label: "Browser-Native Cache" },
+              { icon: Cpu, label: "Multi-track timeline" },
+              { icon: CheckCircle2, label: "Project autosave" },
+              { icon: HardDrive, label: "MP4 export" },
             ].map(({ icon: Icon, label }) => (
               <div
                 key={label}
