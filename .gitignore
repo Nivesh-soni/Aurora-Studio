@@ -4,3 +4,4 @@ dist/
 build/
 /server/uploads/
 /server/exports/
+.gitignore
