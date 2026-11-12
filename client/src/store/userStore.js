@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import axios from 'axios';
+import { create } from "zustand";
+import { syncUser } from "../services/userService";
 
 const useUserStore = create((set) => ({
   user: null,
@@ -7,36 +7,25 @@ const useUserStore = create((set) => ({
   isLoading: false,
   error: null,
 
-  syncUserWithBackend: async (clerkUser) => {
-    if (!clerkUser) return;
+  syncUserWithBackend: async (clerkUser, getToken) => {
+    if (!clerkUser || !getToken) return;
 
-    set({ isLoading: true });
+    set({ isLoading: true, error: null });
     try {
-      const response = await axios.post("http://localhost:3000/api/users/sync", {
-        clerkId: clerkUser.id,
-        email: clerkUser.primaryEmailAddress?.emailAddress || "",
-        name: clerkUser.fullName || "",
-        imageUrl: clerkUser.imageUrl || ""
-      });
-
-      if (response.data.success) {
-        set({ 
-          user: response.data.user, 
-          isSynced: true, 
-          isLoading: false 
-        });
-        console.log("🚀 User state centralized and synced to MongoDB via Zustand!");
+      const token = await getToken();
+      const response = await syncUser(clerkUser, token);
+      if (response.success) {
+        set({ user: response.user, isSynced: true });
       }
-    } catch (err) {
-      set({ 
-        error: err.message || "Failed to sync user", 
-        isLoading: false 
-      });
-      console.error("Error in userStore sync:", err);
+    } catch (error) {
+      set({ error: error.message || "Failed to sync user" });
+      console.error("Error in userStore sync:", error);
+    } finally {
+      set({ isLoading: false });
     }
   },
 
-  clearUser: () => set({ user: null, isSynced: false, error: null })
+  clearUser: () => set({ user: null, isSynced: false, error: null }),
 }));
 
 export default useUserStore;
