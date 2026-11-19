@@ -10,8 +10,11 @@ import {
   Upload,
   Clock3,
   Trash2,
+  Shapes,
+  Smile,
 } from "lucide-react";
 import { getClipGroup } from "./timelineTracks";
+import ColorSlider from "./ColorSlider";
 import { useEditorStore } from "../../store/editorStore";
 
 const snapshotOnce = () => useEditorStore.getState().snapshot();
@@ -33,6 +36,7 @@ const tabs = [
   { id: "media", label: "Media", icon: Upload },
   { id: "audio", label: "Audio", icon: Music2 },
   { id: "text", label: "Text", icon: Type },
+  { id: "shapes", label: "Elements", title: "Elements", icon: Shapes },
   { id: "background", label: "BG", title: "Background", icon: Paintbrush },
   { id: "transitions", label: "Trans.", title: "Transitions", icon: Layers },
   { id: "animations", label: "Anim.", title: "Animations", icon: Sparkles },
@@ -43,25 +47,41 @@ const transitionOptions = [
     id: "none",
     label: "None",
     description: "No transition",
-    preview: "bg-slate-400",
   },
   {
     id: "fade",
     label: "Fade",
     description: "Fade in or out",
-    preview: "bg-cyan-300/50",
   },
   {
     id: "slide-left",
     label: "Slide left",
     description: "Enter from the left",
-    preview: "bg-violet-300",
   },
   {
     id: "slide-right",
     label: "Slide right",
     description: "Enter from the right",
-    preview: "bg-fuchsia-300",
+  },
+  {
+    id: "slide-up",
+    label: "Slide up",
+    description: "Enter from below",
+  },
+  {
+    id: "slide-down",
+    label: "Slide down",
+    description: "Enter from above",
+  },
+  {
+    id: "zoom-in",
+    label: "Zoom in",
+    description: "Grow into place",
+  },
+  {
+    id: "zoom-out",
+    label: "Zoom out",
+    description: "Shrink into place",
   },
 ];
 
@@ -70,27 +90,45 @@ const animationOptions = [
     id: "none",
     label: "None",
     description: "No animation",
-    preview: "bg-slate-400",
   },
   {
     id: "fade",
     label: "Fade in",
     description: "Appear gradually",
-    preview: "bg-cyan-300/50",
   },
   {
     id: "slide-up",
     label: "Slide up",
-    description: "Move up into place",
-    preview: "bg-violet-300",
+    description: "Move up from below",
   },
   {
-    id: "zoom",
+    id: "slide-down",
+    label: "Slide down",
+    description: "Move down from above",
+  },
+  {
+    id: "slide-left",
+    label: "Slide left",
+    description: "Move in from the left",
+  },
+  {
+    id: "slide-right",
+    label: "Slide right",
+    description: "Move in from the right",
+  },
+  {
+    id: "zoom-in",
     label: "Zoom in",
-    description: "Scale into view",
-    preview: "bg-amber-300",
+    description: "Grow into place",
+  },
+  {
+    id: "zoom-out",
+    label: "Zoom out",
+    description: "Shrink into place",
   },
 ];
+
+const emojiOptions = ["😀", "😍", "😂", "😎", "🥳", "❤️", "⭐", "🔥", "👏", "✨", "🌈", "🎉"];
 
 function PresetCard({ option, selected, onClick }) {
   return (
@@ -100,9 +138,12 @@ function PresetCard({ option, selected, onClick }) {
       aria-pressed={selected}
       className={`flex min-w-0 flex-col gap-2 rounded-xl border p-2 text-left transition ${selected ? "border-cyan-400/60 bg-cyan-400/[0.08]" : "border-white/[0.07] bg-[#11151c] hover:border-white/20"}`}
     >
-      <span className="relative flex h-12 w-full items-center justify-center overflow-hidden rounded-md bg-[#080a0e]">
-        <span
-          className={`h-5 w-7 rounded-sm ${option.preview} ${option.id === "fade" ? "opacity-60" : ""} ${option.id === "zoom" ? "scale-75" : ""} ${option.id === "slide-left" ? "-translate-x-1" : ""} ${option.id === "slide-right" ? "translate-x-1" : ""} ${option.id === "slide-up" ? "translate-y-1" : ""}`}
+      <span className="relative block h-12 w-full overflow-hidden rounded-md bg-[#080a0e]">
+        <img
+          src="/aurora-preview.svg"
+          alt=""
+          aria-hidden="true"
+          className={`aurora-preset-image aurora-preset-${option.id} absolute inset-0 h-full w-full object-cover`}
         />
         <span className="absolute inset-0 border border-white/10" />
       </span>
@@ -131,28 +172,15 @@ function BackgroundPanel({
         <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
           Canvas color
         </h3>
-        <label className="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-[#11151c] p-3">
-          <input
-            type="color"
-            aria-label="Canvas background color"
-            value={backgroundColor}
-            onChange={(event) =>
-              setProjectBackground({
-                backgroundColor: event.target.value,
-                backgroundAssetId: null,
-              })
-            }
-            className="h-9 w-10 cursor-pointer rounded-md border-0 bg-transparent p-0"
-          />
-          <span>
-            <span className="block text-[11px] font-medium text-slate-200">
-              Solid color
-            </span>
-            <span className="mt-1 block font-mono text-[10px] uppercase text-slate-500">
-              {backgroundColor}
-            </span>
-          </span>
-        </label>
+        <ColorSlider
+          label="Solid color"
+          value={backgroundColor}
+          onChange={(color) => setProjectBackground({
+            backgroundColor: color,
+            backgroundAssetId: null,
+          })}
+          className="rounded-xl border border-white/[0.07] bg-[#11151c] p-3"
+        />
         <button
           type="button"
           onClick={() =>
@@ -302,22 +330,18 @@ function AnimationPanel({ selectedClip, updateClip }) {
   if (!selectedClip) {
     return (
       <p className="rounded-lg border border-dashed border-white/10 p-4 text-center text-[10px] leading-5 text-slate-500">
-        Select an image or text clip to add an animation.
+        Select a video, image, text, or shape clip to add an animation.
       </p>
     );
   }
-  if (selectedClip.kind !== "image" && selectedClip.kind !== "text") {
+  if (!["video", "image", "text", "shape"].includes(selectedClip.kind)) {
     return (
       <p className="rounded-lg border border-dashed border-white/10 p-4 text-center text-[10px] leading-5 text-slate-500">
-        Animations are available for image and text clips.
+        Animations are available for visual clips.
       </p>
     );
   }
   const animation = selectedClip.animation || {};
-  const options =
-    selectedClip.kind === "image"
-      ? animationOptions.filter((option) => option.id !== "zoom")
-      : animationOptions;
   const setAnimation = (patch, options) =>
     updateClip(
       selectedClip.id,
@@ -333,7 +357,7 @@ function AnimationPanel({ selectedClip, updateClip }) {
         </span>
       </p>
       <div className="grid grid-cols-2 gap-2">
-        {options.map((option) => (
+        {animationOptions.map((option) => (
           <PresetCard
             key={option.id}
             option={option}
@@ -378,6 +402,8 @@ export default function Sidebar({
   selectedClip,
   addToTimeline,
   addTextClip,
+  addShapeClip,
+  addEmojiClip,
   onPickFiles,
   removeAsset,
   updateClip,
@@ -482,6 +508,52 @@ export default function Sidebar({
               </span>
             </button>
           </div>
+        ) : activeTab === "shapes" ? (
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto">
+            <section className="space-y-2">
+              <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Shapes</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  ["rectangle", "Rectangle"],
+                  ["rounded", "Rounded"],
+                  ["circle", "Circle"],
+                  ["ellipse", "Ellipse"],
+                  ["triangle", "Triangle"],
+                  ["line", "Line"],
+                  ["arrow", "Arrow"],
+                ].map(([shapeType, label]) => (
+                  <button
+                    key={shapeType}
+                    type="button"
+                    onClick={() => addShapeClip(shapeType)}
+                    className="flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border border-white/[0.07] bg-[#11151c] text-slate-300 transition hover:border-cyan-400/50 hover:bg-cyan-400/[0.06] hover:text-cyan-200"
+                  >
+                    <span className={`block bg-cyan-400/80 ${shapeType === "circle" ? "h-7 w-7 rounded-full" : shapeType === "rounded" ? "h-7 w-10 rounded-lg" : shapeType === "triangle" ? "h-0 w-0 border-x-[14px] border-b-[28px] border-x-transparent border-b-cyan-400/80 bg-transparent" : shapeType === "line" || shapeType === "arrow" ? "h-1 w-9 rounded-full" : "h-7 w-10"}`} />
+                    <span className="text-[9px] font-medium">{label}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+            <section className="space-y-2">
+              <h3 className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <Smile size={12} /> Emojis
+              </h3>
+              <div className="grid grid-cols-4 gap-2">
+                {emojiOptions.map((emoji) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    aria-label={`Add ${emoji} emoji`}
+                    title={`Add ${emoji} emoji`}
+                    onClick={() => addEmojiClip(emoji)}
+                    className="flex aspect-square items-center justify-center rounded-xl border border-white/[0.07] bg-[#11151c] text-2xl transition hover:border-cyan-400/50 hover:bg-cyan-400/[0.06]"
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            </section>
+          </div>
         ) : (
           <div className="min-h-0 flex-1 overflow-y-auto">
             <button
@@ -543,6 +615,11 @@ export default function Sidebar({
                             {asset.duration
                               ? formatDuration(asset.duration)
                               : asset.kind}
+                            {asset.syncStatus && asset.syncStatus !== "synced" && (
+                              <span className={asset.syncStatus === "failed" ? "ml-1 text-rose-400" : "ml-1 text-amber-400"}>
+                                · {asset.syncStatus === "pending" ? "syncing" : asset.syncStatus}
+                              </span>
+                            )}
                           </span>
                         </span>
                         <Plus

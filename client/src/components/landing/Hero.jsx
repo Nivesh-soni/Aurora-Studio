@@ -1,5 +1,6 @@
-import { SignUpButton } from "@clerk/clerk-react";
+import { SignUpButton, SignedIn, SignedOut } from "@clerk/clerk-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
   Compass,
@@ -47,6 +48,8 @@ const pulseGlow = {
 };
 
 export default function Hero() {
+  const navigate = useNavigate();
+
   return (
     <section className="pt-16 pb-20 md:pt-22 md:pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <motion.div
@@ -63,7 +66,7 @@ export default function Hero() {
           >
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
             <span className="text-cyan-300 font-medium">
-              ✦ Aurora Studio 2.0 is live
+              ✦ Aurora Studio is ready
             </span>
             <span className="text-slate-500">—</span>
             <span className="hidden sm:inline">
@@ -100,19 +103,35 @@ export default function Hero() {
           className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
         >
           {/* Primary Pulsing CTA */}
-          <SignUpButton mode="modal">
+          <SignedIn>
             <motion.button
               variants={pulseGlow}
               initial="initial"
               animate="animate"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
+              onClick={() => navigate("/dashboard")}
               className="cursor-pointer w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-medium text-sm bg-linear-to-r from-cyan-500 via-blue-500 to-indigo-500 text-white shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all group"
             >
               <span>Start Creating Free</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </motion.button>
-          </SignUpButton>
+          </SignedIn>
+          <SignedOut>
+            <SignUpButton mode="modal">
+              <motion.button
+                variants={pulseGlow}
+                initial="initial"
+                animate="animate"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+                className="cursor-pointer w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-medium text-sm bg-linear-to-r from-cyan-500 via-blue-500 to-indigo-500 text-white shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all group"
+              >
+                <span>Start Creating Free</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </motion.button>
+            </SignUpButton>
+          </SignedOut>
 
           {/* Secondary CTA */}
           <motion.a

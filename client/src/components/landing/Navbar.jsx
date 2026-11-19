@@ -17,7 +17,7 @@ export default function Navbar() {
           <div className="w-8 h-8 rounded-lg bg-linear-to-tr from-cyan-500 to-indigo-500 p-px shadow-lg shadow-cyan-500/20">
             <div className="w-full h-full bg-[#07090e] rounded-[7px] flex items-center justify-center">
               <img
-                src="Logo-without-bg.png"
+                src="logo.svg"
                 className="text-cyan-400 group-hover:rotate-6 transition-transform"
                 alt="Aurora Studio Logo"
               />

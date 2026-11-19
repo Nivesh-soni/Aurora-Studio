@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Film, Music2, Type, Volume2, VolumeX, ZoomIn, ZoomOut } from "lucide-react";
+import { Film, Music2, Shapes, Type, Volume2, VolumeX, ZoomIn, ZoomOut } from "lucide-react";
 import { getClipGroup, getTimelineTracks, getTrackGroup, getTrackNumber } from "./timelineTracks";
 
 const formatTime = (seconds) => {
@@ -13,6 +13,7 @@ const trackStyle = {
   media: "border-violet-400/40 bg-violet-400/15",
   audio: "border-cyan-400/40 bg-cyan-400/15",
   text: "border-sky-400/40 bg-sky-400/15",
+  elements: "border-amber-400/40 bg-amber-400/15",
 };
 
 export default function Timeline({
@@ -61,6 +62,7 @@ export default function Timeline({
 
   const handleScrub = (event) => {
     if (event.target.closest("[data-no-scrub]")) return;
+    selectClip(null);
     setCurrentTime(Math.min(duration, timeAtPointer(event.clientX)));
   };
 
@@ -182,7 +184,7 @@ export default function Timeline({
               style={{ backgroundImage: "linear-gradient(to right, rgba(255,255,255,0.035) 1px, transparent 1px)", backgroundSize: `${scale}px 100%` }}
             >
               <div data-no-scrub className="sticky left-0 z-10 flex w-32 shrink-0 items-center gap-2 border-r border-white/[0.08] bg-[#10141b] px-3 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-                {track.group === "media" ? <Film size={14} /> : track.group === "audio" ? <Music2 size={14} /> : <Type size={14} />}
+                {track.group === "media" ? <Film size={14} /> : track.group === "audio" ? <Music2 size={14} /> : track.group === "elements" ? <Shapes size={14} /> : <Type size={14} />}
                 {track.group} {track.number}
               </div>
               {clips.filter((clip) => getTrackGroup(clip.track) === track.group && getTrackNumber(clip.track) === track.number).map((clip) => {
@@ -201,7 +203,11 @@ export default function Timeline({
                     onPointerMove={updateTrim}
                     onPointerUp={endTrim}
                     onPointerCancel={endTrim}
-                    onClick={(event) => { event.stopPropagation(); selectClip(clip.id); }}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      selectClip(clip.id);
+                      setCurrentTime(clip.start);
+                    }}
                     title={`${clip.name} · ${formatTime(clip.duration)}`}
                     role="button"
                     tabIndex={0}
@@ -209,12 +215,13 @@ export default function Timeline({
                       if (event.key === "Enter") {
                         event.preventDefault();
                         selectClip(clip.id);
+                        setCurrentTime(clip.start);
                       }
                     }}
                     className={`absolute top-1.5 flex h-10 items-center gap-2 overflow-hidden rounded-lg border px-2 text-left shadow-md transition ${trackStyle[track.group]} ${draggingClipId === clip.id ? "cursor-grabbing opacity-70" : "cursor-grab"} ${selectedClipId === clip.id ? "ring-2 ring-cyan-300 ring-offset-1 ring-offset-[#0c0f14]" : "hover:brightness-125"}`}
                     style={{ left: labelWidth + clip.start * scale, width: Math.max(46, clip.duration * scale) }}
                   >
-                    {["video", "image", "audio", "text"].includes(clip.kind) && selectedClipId === clip.id && (
+                    {["video", "image", "audio", "text", "shape"].includes(clip.kind) && selectedClipId === clip.id && (
                       <>
                         <button
                           type="button"

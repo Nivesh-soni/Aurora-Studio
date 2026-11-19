@@ -10,6 +10,10 @@ const AssetSchema = new mongoose.Schema({
   duration: { type: Number, default: 0 },
   width: { type: Number, default: 0 },
   height: { type: Number, default: 0 },
+  url: { type: String, default: "" },
+  cloudinaryPublicId: { type: String, default: "" },
+  syncStatus: { type: String, enum: ["local", "pending", "failed", "synced"], default: "local" },
+  syncError: { type: String, default: "" },
 }, { _id: false });
 
 const ProjectSchema = new mongoose.Schema({

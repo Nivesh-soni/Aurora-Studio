@@ -13,14 +13,41 @@ import { DEFAULT_ASPECT_RATIO } from "../constants/aspectRatios";
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 const makeId = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`;
+const createTextClip = (clips, { start, text, name, fontSize = 48, isEmoji = false }) => {
+  const duration = 5;
+  const startAt = Math.max(0, start);
+  return {
+    id: makeId(),
+    name,
+    kind: "text",
+    track: findAvailableTrack(clips, isEmoji ? "elements" : "text", startAt, duration),
+    text,
+    start: startAt,
+    sourceStart: 0,
+    duration,
+    speed: 1,
+    opacity: 100,
+    textColor: "#ffffff",
+    fontSize,
+    fontFamily: isEmoji ? "Segoe UI Emoji" : "Arial",
+    ...(isEmoji ? { isEmoji: true } : {}),
+    x: 50,
+    y: 50,
+    scale: 100,
+    rotation: 0,
+    layerOrder: nextLayerOrder(clips),
+    textPosition: "center",
+    animation: { type: "none", duration: 0.5 },
+  };
+};
 const getAssetUrl = (asset) => asset.url || `${API_URL}/uploads/${encodeURIComponent(asset.fileName)}`;
 const getDefaultLayerOrder = (clip, index) => (
-  (clip.kind === "video" ? 0 : clip.kind === "image" ? 1000 : clip.kind === "text" ? 2000 : -1) + index / 1000
+  (clip.kind === "video" ? 0 : clip.kind === "image" ? 1000 : ["text", "shape"].includes(clip.kind) ? 2000 : -1) + index / 1000
 );
 const normalizeClipLayers = (clips) => {
   const orderedVisualClips = clips
     .map((clip, index) => ({ clip, index }))
-    .filter(({ clip }) => clip.kind === "video" || clip.kind === "image" || clip.kind === "text")
+    .filter(({ clip }) => ["video", "image", "text", "shape"].includes(clip.kind))
     .sort((first, second) => (
       Number(first.clip.layerOrder ?? getDefaultLayerOrder(first.clip, first.index))
       - Number(second.clip.layerOrder ?? getDefaultLayerOrder(second.clip, second.index))
@@ -29,7 +56,7 @@ const normalizeClipLayers = (clips) => {
   return clips.map((clip) => layers.has(clip.id) ? { ...clip, layerOrder: layers.get(clip.id) } : clip);
 };
 const nextLayerOrder = (clips) => Math.max(-1, ...clips
-  .filter((clip) => clip.kind === "video" || clip.kind === "image" || clip.kind === "text")
+  .filter((clip) => ["video", "image", "text", "shape"].includes(clip.kind))
   .map((clip, index) => Number(clip.layerOrder ?? getDefaultLayerOrder(clip, index)))) + 1;
 let projectLoadId = 0;
 
@@ -154,31 +181,59 @@ export const useEditorStore = create((set, get) => ({
 
   addTextClip: (start = get().currentTime) => {
     const clips = get().clips;
+    get().snapshot();
+    const clip = createTextClip(clips, {
+      start,
+      text: "Your title",
+      name: "Text overlay",
+    });
+    set((state) => ({ clips: [...state.clips, clip], selectedClipId: clip.id }));
+  },
+
+  addEmojiClip: (emoji, start = get().currentTime) => {
+    const clips = get().clips;
+    get().snapshot();
+    const clip = createTextClip(clips, {
+      start,
+      text: emoji,
+      name: `${emoji} emoji`,
+      fontSize: 112,
+      isEmoji: true,
+    });
+    set((state) => ({ clips: [...state.clips, clip], selectedClipId: clip.id }));
+  },
+
+  addShapeClip: (shapeType = "rectangle", start = get().currentTime) => {
+    const clips = get().clips;
     const duration = 5;
     const startAt = Math.max(0, start);
-    const track = findAvailableTrack(clips, "text", startAt, duration);
+    const track = findAvailableTrack(clips, "elements", startAt, duration);
     get().snapshot();
     const clip = {
       id: makeId(),
-      name: "Text overlay",
-      kind: "text",
+      name: `${shapeType.charAt(0).toUpperCase()}${shapeType.slice(1)} shape`,
+      kind: "shape",
+      shapeType,
       track,
-      text: "Your title",
       start: startAt,
+      duration,
       sourceStart: 0,
-      duration: 5,
       speed: 1,
       opacity: 100,
-      textColor: "#ffffff",
-      fontSize: 48,
-      fontFamily: "Arial",
+      fillEnabled: false,
+      fillColor: "#38bdf8",
+      strokeColor: "#000000",
+      strokeWidth: 3,
       x: 50,
       y: 50,
+      width: shapeType === "line" || shapeType === "arrow" ? 40 : 30,
+      height: shapeType === "line" || shapeType === "arrow" ? 8 : 30,
       scale: 100,
       rotation: 0,
+      cornerRadius: 12,
       layerOrder: nextLayerOrder(clips),
-      textPosition: "center",
       animation: { type: "none", duration: 0.5 },
+      transition: { type: "none", placement: "in", duration: 0.5 },
     };
     set((state) => ({ clips: [...state.clips, clip], selectedClipId: clip.id }));
   },
@@ -192,7 +247,7 @@ export const useEditorStore = create((set, get) => ({
       ...clone(sourceClip),
       id: makeId(),
       start: startAt,
-      ...((sourceClip.kind === "video" || sourceClip.kind === "image" || sourceClip.kind === "text")
+      ...((["video","image","text","shape"].includes(sourceClip.kind))
         ? { layerOrder: nextLayerOrder(clips) }
         : {}),
       track: findAvailableTrack(clips, group, startAt, sourceClip.duration, null, sourceClip.track),
@@ -232,6 +287,16 @@ export const useEditorStore = create((set, get) => ({
           const sourceLength = Math.min(clip.duration * (clip.speed || 1), availableSource);
           updated.duration = Math.max(0.1, sourceLength / updated.speed);
         }
+        if (updated.start !== clip.start || updated.duration !== clip.duration) {
+          updated.track = findAvailableTrack(
+            state.clips,
+            getClipGroup(clip),
+            updated.start,
+            updated.duration,
+            id,
+            updated.track || clip.track,
+          );
+        }
         return updated;
       }),
     }));
@@ -240,9 +305,9 @@ export const useEditorStore = create((set, get) => ({
   setClipLayer: (id, direction) => {
     const clips = get().clips;
     const target = clips.find((clip) => clip.id === id);
-    if (!target || !["video", "image", "text"].includes(target.kind)) return;
+    if (!target || !["video", "image", "text", "shape"].includes(target.kind)) return;
     const ordered = normalizeClipLayers(clips)
-      .filter((clip) => clip.kind === "video" || clip.kind === "image" || clip.kind === "text")
+      .filter((clip) => ["video", "image", "text", "shape"].includes(clip.kind))
       .sort((first, second) => first.layerOrder - second.layerOrder);
     const currentIndex = ordered.findIndex((clip) => clip.id === id);
     if (currentIndex < 0 || (direction === "front" && currentIndex === ordered.length - 1)
@@ -260,7 +325,7 @@ export const useEditorStore = create((set, get) => ({
 
   trimClip: (id, patch) => {
     const clip = get().clips.find((item) => item.id === id);
-    if (!clip || !["video", "audio", "image", "text"].includes(clip.kind)) return;
+    if (!clip || !["video", "audio", "image", "text", "shape"].includes(clip.kind)) return;
     const nextStart = Math.max(0, Number(patch.start) || 0);
     const nextDuration = Math.max(0.1, Number(patch.duration) || 0.1);
     const nextSourceStart = clip.kind === "video" || clip.kind === "audio"

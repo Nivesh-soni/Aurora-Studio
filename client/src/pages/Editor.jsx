@@ -81,6 +81,8 @@ export default function Editor() {
   const uploadFiles = useEditorStore((state) => state.uploadFiles);
   const addToTimeline = useEditorStore((state) => state.addToTimeline);
   const addTextClip = useEditorStore((state) => state.addTextClip);
+  const addEmojiClip = useEditorStore((state) => state.addEmojiClip);
+  const addShapeClip = useEditorStore((state) => state.addShapeClip);
   const selectClip = useEditorStore((state) => state.selectClip);
   const setCurrentTime = useEditorStore((state) => state.setCurrentTime);
   const setPlaying = useEditorStore((state) => state.setPlaying);
@@ -175,18 +177,6 @@ export default function Editor() {
     setError,
   ]);
 
-  const contentDuration = Math.max(
-    0,
-    ...clips.map((clip) => clip.start + clip.duration),
-  );
-  const timelineDuration = Math.max(15, contentDuration);
-  const previewDuration = Math.max(1, contentDuration);
-  const togglePlayback = useCallback(() => {
-    const state = useEditorStore.getState();
-    if (!state.isPlaying && state.currentTime >= previewDuration)
-      setCurrentTime(0);
-    setPlaying(!state.isPlaying);
-  }, [previewDuration, setCurrentTime, setPlaying]);
   const activeInspectorDraft =
     inspectorDraft?.id === selectedClipId ? inspectorDraft : null;
   const previewClips = activeInspectorDraft
@@ -196,6 +186,18 @@ export default function Editor() {
           : clip,
       )
     : clips;
+  const contentDuration = Math.max(
+    0,
+    ...previewClips.map((clip) => clip.start + clip.duration),
+  );
+  const timelineDuration = Math.max(15, contentDuration);
+  const previewDuration = Math.max(1, contentDuration);
+  const togglePlayback = useCallback(() => {
+    const state = useEditorStore.getState();
+    if (!state.isPlaying && state.currentTime >= previewDuration)
+      setCurrentTime(0);
+    setPlaying(!state.isPlaying);
+  }, [previewDuration, setCurrentTime, setPlaying]);
   const activeVideos = previewClips
     .filter(
       (clip) =>
@@ -221,6 +223,12 @@ export default function Editor() {
   const activeTexts = previewClips.filter(
     (clip) =>
       clip.kind === "text" &&
+      currentTime >= clip.start &&
+      currentTime < clip.start + clip.duration,
+  );
+  const activeShapes = previewClips.filter(
+    (clip) =>
+      clip.kind === "shape" &&
       currentTime >= clip.start &&
       currentTime < clip.start + clip.duration,
   );
@@ -618,7 +626,7 @@ export default function Editor() {
         onChange={(event) => handleFileInputChange(event, "audio")}
       />
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[minmax(0,1fr)_210px] lg:grid-cols-[264px_minmax(0,1fr)] xl:grid-cols-[264px_minmax(0,1fr)_260px] xl:grid-rows-[minmax(0,1fr)_220px]">
+      <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[minmax(0,1fr)_190px] lg:grid-cols-[264px_minmax(0,1fr)] xl:grid-cols-[264px_minmax(0,1fr)_260px] xl:grid-rows-[minmax(0,1fr)_190px]">
         <Sidebar
           assets={assets}
           activeTab={activeSidebarTab}
@@ -626,6 +634,8 @@ export default function Editor() {
           selectedClip={selected}
           addToTimeline={addToTimeline}
           addTextClip={() => addTextClip(currentTime)}
+          addShapeClip={(shapeType) => addShapeClip(shapeType, currentTime)}
+          addEmojiClip={(emoji) => addEmojiClip(emoji, currentTime)}
           onPickFiles={openFilePicker}
           removeAsset={removeAsset}
           updateClip={updateClip}
@@ -681,17 +691,23 @@ export default function Editor() {
             activeClip={activeClip}
             activeImages={activeImages}
             activeTexts={activeTexts}
+            activeShapes={activeShapes}
             activeAudio={activeAudio}
             assets={assets}
+            clips={clips}
             currentTime={currentTime}
             duration={previewDuration}
             isPlaying={isPlaying}
             aspectRatio={aspectRatio}
             backgroundColor={backgroundColor}
             backgroundAsset={backgroundAsset}
-            onBackgroundClick={() => setActiveSidebarTab("background")}
+            onBackgroundClick={() => {
+              selectClip(null);
+              setActiveSidebarTab("background");
+            }}
             setPlaying={setPlaying}
             togglePlayback={togglePlayback}
+            setCurrentTime={setCurrentTime}
             selectedClip={previewSelected}
             selectClip={selectClip}
             updateClip={updateClip}
@@ -702,7 +718,9 @@ export default function Editor() {
         <Inspector
           selected={selected}
           selectedAsset={selectedAsset}
+          clips={clips}
           currentTime={currentTime}
+          setCurrentTime={setCurrentTime}
           updateClip={updateClip}
           duplicateClip={duplicateClip}
           splitClip={splitClip}
@@ -710,10 +728,10 @@ export default function Editor() {
           onDraftChange={setInspectorDraft}
         />
         <Timeline
-          clips={clips}
+          clips={previewClips}
           assets={assets}
           selectedClipId={selectedClipId}
-          selectedClip={selected}
+          selectedClip={previewSelected}
           currentTime={currentTime}
           duration={timelineDuration}
           zoom={zoom}
@@ -741,6 +759,8 @@ export default function Editor() {
           selectedClip={selected}
           addToTimeline={addToTimeline}
           addTextClip={() => addTextClip(currentTime)}
+          addShapeClip={(shapeType) => addShapeClip(shapeType, currentTime)}
+          addEmojiClip={(emoji) => addEmojiClip(emoji, currentTime)}
           onPickFiles={openFilePicker}
           removeAsset={removeAsset}
           updateClip={updateClip}
@@ -758,7 +778,9 @@ export default function Editor() {
           className="flex h-full min-h-0 min-w-0 flex-col bg-[#0c0f14]"
           selected={selected}
           selectedAsset={selectedAsset}
+          clips={clips}
           currentTime={currentTime}
+          setCurrentTime={setCurrentTime}
           updateClip={updateClip}
           duplicateClip={duplicateClip}
           splitClip={splitClip}

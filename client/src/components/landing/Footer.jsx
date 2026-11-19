@@ -40,11 +40,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-12 py-16 lg:py-20">
           {/* Brand */}
           <div className="lg:col-span-5">
-            <a href="#home" className="inline-flex items-center gap-3 group">
+            <div className="inline-flex items-center gap-3 group">
               <div className="w-8 h-8 rounded-lg bg-linear-to-tr from-cyan-500 to-indigo-500 p-px shadow-lg shadow-cyan-500/20">
                 <div className="w-full h-full bg-[#07090e] rounded-[7px] flex items-center justify-center">
                   <img
-                    src="Logo-without-bg.png"
+                    src="logo.svg"
                     className="text-cyan-400 group-hover:rotate-6 transition-transform"
                     alt=""
                   />
@@ -54,7 +54,7 @@ export default function Footer() {
                 Aurora{" "}
                 <span className="text-slate-400 font-normal">Studio</span>
               </span>
-            </a>
+            </div>
 
             <p className="mt-6 max-w-sm text-sm text-slate-400 leading-7">
               Your creativity deserves better tools. Create, edit, and bring

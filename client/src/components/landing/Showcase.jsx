@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Play,
@@ -16,10 +16,68 @@ import {
   SplitSquareVertical,
 } from "lucide-react";
 
+const formatVideoTime = (time) => {
+  const numericTime = Number(time);
+  const totalSeconds = Number.isFinite(numericTime)
+    ? Math.floor(Math.max(0, numericTime))
+    : 0;
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return [hours, minutes, seconds]
+    .map((part) => String(part).padStart(2, "0"))
+    .join(":");
+};
+
 export default function Showcase() {
+  const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isVideoVisible, setIsVideoVisible] = useState(false);
+  const [isManuallyPaused, setIsManuallyPaused] = useState(false);
+  const [videoTime, setVideoTime] = useState(0);
+  const [videoDuration, setVideoDuration] = useState(0);
   const [audioDucking, setAudioDucking] = useState(true);
   const [aiCaptions, setAiCaptions] = useState(true);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVideoVisible(entry.isIntersecting && entry.intersectionRatio >= 0.1),
+      { threshold: 0.1 },
+    );
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (!isVideoVisible || isManuallyPaused) {
+      video.pause();
+      return;
+    }
+
+    video.play().catch((error) => {
+      if (error.name !== "AbortError") {
+        console.error("Showcase video playback failed:", error);
+      }
+    });
+  }, [isVideoVisible, isManuallyPaused]);
+
+  const togglePlayback = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (!video.paused) {
+      setIsManuallyPaused(true);
+      video.pause();
+    } else {
+      setIsManuallyPaused(false);
+    }
+  };
 
   return (
     <section
@@ -35,7 +93,7 @@ export default function Showcase() {
           </span>
         </div>
         <div className="flex items-center gap-4 text-[11px] font-mono">
-          <span>Engine: v2.4-WebGPU</span>
+          <span>Engine: WebGPU</span>
           <span className="flex items-center gap-1.5 text-emerald-400">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
             Buffer: 100%
@@ -115,7 +173,7 @@ export default function Showcase() {
               <div className="grid grid-cols-2 gap-2">
                 {[
                   {
-                    title: "Cyber_Relic_V1.mp4",
+                    title: "Cyber_Relic.mp4",
                     duration: "00:42",
                     grad: "from-cyan-900 to-indigo-950",
                   },
@@ -175,42 +233,34 @@ export default function Showcase() {
                 PREVIEW MONITOR • 3840 x 2160 (16:9)
               </span>
               <span className="font-mono text-cyan-400 font-semibold text-[11px]">
-                00:01:26:18 / 00:03:45:00
+                {formatVideoTime(videoTime)} / {formatVideoTime(videoDuration)}
               </span>
             </div>
 
             {/* Monitor Screen Frame */}
             <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 flex items-center justify-center shadow-inner group">
-              {/* Aurora Artwork Canvas */}
-              <div className="absolute inset-0 bg-linear-to-t from-indigo-950 via-slate-950 to-slate-900">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-cyan-400/20 via-indigo-500/10 to-transparent" />
-
-                {/* Glowing Mountain & Aurora Silhouette simulation */}
-                <div className="absolute bottom-0 inset-x-0 h-28 bg-linear-to-t from-black via-slate-950/80 to-transparent" />
-
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 text-center pointer-events-none">
-                  <span className="text-[9px] uppercase tracking-widest text-cyan-300 font-mono block">
-                    Title Track
-                  </span>
-                  <h4 className="text-xl sm:text-2xl font-black text-white tracking-widest drop-shadow-[0_0_15px_rgba(6,182,212,0.8)]">
-                    AURORA VISIONS
-                  </h4>
-                </div>
-              </div>
-
-              {/* Center playback micro-interaction */}
-              <motion.button
-                whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="z-10 w-12 h-12 rounded-full bg-cyan-500/90 text-white flex items-center justify-center shadow-lg shadow-cyan-500/30 backdrop-blur-md"
-              >
-                {isPlaying ? (
-                  <Pause className="w-5 h-5" />
-                ) : (
-                  <Play className="w-5 h-5 ml-0.5" />
-                )}
-              </motion.button>
+              <video
+                ref={videoRef}
+                src="aurora.webm"
+                loop
+                muted
+                playsInline
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onTimeUpdate={(event) => setVideoTime(event.currentTarget.currentTime)}
+                onLoadedMetadata={(event) => {
+                  if (Number.isFinite(event.currentTarget.duration)) {
+                    setVideoDuration(event.currentTarget.duration);
+                  }
+                }}
+                onDurationChange={(event) => {
+                  if (Number.isFinite(event.currentTarget.duration)) {
+                    setVideoDuration(event.currentTarget.duration);
+                  }
+                }}
+                onError={() => setIsPlaying(false)}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
 
               <div className="absolute bottom-2 right-2 text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/60 text-slate-300 flex items-center gap-1">
                 <Maximize2 className="w-3 h-3" /> Full Res
@@ -224,7 +274,11 @@ export default function Showcase() {
                   <SkipBack className="h-5" />
                 </button>
                 <button
-                  onClick={() => setIsPlaying(!isPlaying)}
+                  onClick={togglePlayback}
+                  type="button"
+                  aria-label={
+                    isPlaying ? "Pause showcase video" : "Play showcase video"
+                  }
                   className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"
                 >
                   {isPlaying ? (
@@ -253,7 +307,7 @@ export default function Showcase() {
             <div className="flex items-center justify-between pb-2 border-b border-white/5">
               <span className="font-semibold text-slate-300">Inspector</span>
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono">
-                V1 Selected
+                Video 1 Selected
               </span>
             </div>
 
@@ -374,7 +428,7 @@ export default function Showcase() {
 
             {/* Track T1 (Text/FX) */}
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono text-slate-400 w-7">
+              <span className="text-[10px] font-mono text-slate-400 w-14 shrink-0">
                 T1 👁
               </span>
               <div className="flex-1 h-7 rounded bg-slate-900/80 border border-white/5 flex items-center px-1 overflow-hidden">
@@ -384,10 +438,10 @@ export default function Showcase() {
               </div>
             </div>
 
-            {/* Track V2 */}
+            {/* Secondary video track */}
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono text-slate-400 w-7">
-                V2 👁
+              <span className="text-[10px] font-mono text-slate-400 w-14 shrink-0">
+                Video 2 👁
               </span>
               <div className="flex-1 h-7 rounded bg-slate-900/80 border border-white/5 flex items-center px-1 overflow-hidden gap-1.5">
                 <div className="ml-[12%] w-[24%] h-5 rounded bg-blue-950 border border-blue-600/40 text-[10px] text-blue-200 px-2 flex items-center font-mono truncate">
@@ -399,10 +453,10 @@ export default function Showcase() {
               </div>
             </div>
 
-            {/* Track V1 (Main Video) */}
+            {/* Main video track */}
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono text-cyan-400 font-bold w-7">
-                V1 👁
+              <span className="text-[10px] font-mono text-cyan-400 font-bold w-14 shrink-0">
+                Video 1 👁
               </span>
               <div className="flex-1 h-8 rounded bg-slate-900/80 border border-white/5 flex items-center px-1 overflow-hidden gap-1">
                 <div className="w-[35%] h-6 rounded bg-linear-to-r from-cyan-950 to-blue-950 border border-cyan-500/50 text-[10px] text-cyan-200 px-2 flex items-center font-mono truncate">
@@ -420,7 +474,7 @@ export default function Showcase() {
 
             {/* Track A1 (Audio Waveform) */}
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono text-slate-400 w-7">
+              <span className="text-[10px] font-mono text-slate-400 w-14 shrink-0">
                 A1 🔊
               </span>
               <div className="flex-1 h-7 rounded bg-slate-900/80 border border-white/5 flex items-center px-1 overflow-hidden">

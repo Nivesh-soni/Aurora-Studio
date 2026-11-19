@@ -1,8 +1,9 @@
-export const TRACK_GROUPS = ["media", "audio", "text"];
+export const TRACK_GROUPS = ["media", "audio", "text", "elements"];
 
 export function getTrackGroup(track) {
   if (track === "video" || track === "image" || track?.startsWith("media-")) return "media";
   if (track === "audio" || track?.startsWith("audio-")) return "audio";
+  if (track === "shape" || track?.startsWith("shape-") || track === "elements" || track?.startsWith("elements-")) return "elements";
   if (track === "text" || track?.startsWith("text-")) return "text";
   return null;
 }
@@ -38,6 +39,7 @@ export function normalizeClipTracks(clips) {
 }
 
 export function getClipGroup(clip) {
+  if (clip.kind === "shape" || clip.isEmoji) return "elements";
   if (clip.kind === "text") return "text";
   if (clip.kind === "audio") return "audio";
   return "media";

@@ -1,5 +1,6 @@
-import { SignUpButton } from "@clerk/clerk-react";
+import { SignUpButton, SignedIn, SignedOut } from "@clerk/clerk-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { CheckCircle2, ArrowRight, Zap, Play } from "lucide-react";
 
 const pulseGlow = {
@@ -21,6 +22,8 @@ const pulseGlow = {
 };
 
 export default function CTASection() {
+  const navigate = useNavigate();
+
   return (
     <section className="py-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
@@ -50,17 +53,31 @@ export default function CTASection() {
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <SignUpButton mode="modal">
+              <SignedIn>
                 <motion.button
                   variants={pulseGlow}
                   initial="initial"
                   animate="animate"
+                  onClick={() => navigate("/dashboard")}
                   className="cursor-pointer w-full sm:w-auto px-8 py-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-[#07090e] font-bold text-sm flex items-center justify-center gap-2 transition-colors"
                 >
                   Start Creating Now
                   <ArrowRight className="w-4 h-4" />
                 </motion.button>
-              </SignUpButton>
+              </SignedIn>
+              <SignedOut>
+                <SignUpButton mode="modal">
+                  <motion.button
+                    variants={pulseGlow}
+                    initial="initial"
+                    animate="animate"
+                    className="cursor-pointer w-full sm:w-auto px-8 py-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-[#07090e] font-bold text-sm flex items-center justify-center gap-2 transition-colors"
+                  >
+                    Start Creating Now
+                    <ArrowRight className="w-4 h-4" />
+                  </motion.button>
+                </SignUpButton>
+              </SignedOut>
 
               <a href="#showcase" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors">
                 <Play className="w-4 h-4" />

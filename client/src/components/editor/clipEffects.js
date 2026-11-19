@@ -25,18 +25,26 @@ export function getClipTransitionStyle(clip, currentTime) {
   const widthShare =
     (clip.kind === "text" ? 0.8 : 1) *
     Math.max(0.1, Number(clip.scale ?? 100) / 100);
-  const offset = ((1 - progress) * 100) / widthShare;
-  const scale = 0.8 + progress * 0.2;
-  const direction = type === "slide-right" ? 1 : -1;
+  const offsetX = ((1 - progress) * 100) / widthShare;
+  const offsetY =
+    ((1 - progress) * 100) /
+    Math.max(0.1, Number(clip.scale ?? 100) / 100);
+  const directionX = type === "slide-right" ? 1 : -1;
+  const directionY = type === "slide-down" ? -1 : 1;
+  const zoomScale = Number(
+    (type === "zoom-out" ? 1.2 - progress * 0.2 : 0.8 + progress * 0.2).toFixed(4),
+  );
 
   return {
     opacity: type === "fade" ? progress : 1,
     transform:
       type === "slide-left" || type === "slide-right"
-        ? `translateX(${offset * direction}%)`
-        : type === "zoom"
-          ? `scale(${scale})`
-          : "",
+        ? `translateX(${offsetX * directionX}%)`
+        : type === "slide-up" || type === "slide-down"
+          ? `translateY(${offsetY * directionY}%)`
+          : ["zoom", "zoom-in", "zoom-out"].includes(type)
+            ? `scale(${zoomScale})`
+            : "",
   };
 }
 
@@ -48,16 +56,25 @@ export function getClipAnimationStyle(clip, currentTime) {
     Math.min(Number(animation.duration) || 0.5, clip.duration),
   );
   const progress = clampProgress((currentTime - clip.start) / duration);
-  const scale = 0.6 + progress * 0.4;
+  const scale = Number(
+    (type === "zoom-out" ? 1.4 - progress * 0.4 : 0.6 + progress * 0.4).toFixed(4),
+  );
+  const slideOffset = 48 * (1 - progress);
 
   return {
     opacity: type === "fade" ? progress : 1,
     transform:
       type === "slide-up"
-        ? `translateY(${(1 - progress) * 48}px)`
-        : type === "zoom"
-          ? `scale(${scale})`
-          : "",
+        ? `translateY(${slideOffset}px)`
+        : type === "slide-down"
+          ? `translateY(${-slideOffset}px)`
+          : type === "slide-left"
+            ? `translateX(${-slideOffset}px)`
+            : type === "slide-right"
+              ? `translateX(${slideOffset}px)`
+              : ["zoom", "zoom-in", "zoom-out"].includes(type)
+                ? `scale(${scale})`
+                : "",
   };
 }
 

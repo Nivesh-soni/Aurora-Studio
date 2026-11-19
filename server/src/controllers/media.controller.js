@@ -3,6 +3,9 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import multer from "multer";
+import Project from "../models/project.model.js";
+import { isCloudinaryConfigured, uploadMediaAsset } from "../services/cloudinary.service.js";
+import { syncProjectAsset } from "../services/mediaSync.service.js";
 
 const uploadDirectory = fileURLToPath(new URL("../../uploads/", import.meta.url));
 mkdirSync(uploadDirectory, { recursive: true });
@@ -59,7 +62,7 @@ export const upload = multer({
   },
 });
 
-export const uploadMedia = (req, res) => {
+export const uploadMedia = async (req, res) => {
   const files = req.files ?? [];
   if (!files.length) {
     res.status(400).json({ error: "Choose at least one media file to upload." });
@@ -74,8 +77,10 @@ export const uploadMedia = (req, res) => {
     return;
   }
 
-  res.status(201).json({
-    assets: files.map((file, index) => ({
+  const assets = [];
+  for (let index = 0; index < files.length; index += 1) {
+    const file = files[index];
+    const asset = {
       id: path.parse(file.filename).name,
       fileName: file.filename,
       name: file.originalname,
@@ -86,6 +91,43 @@ export const uploadMedia = (req, res) => {
       width: Number(metadata[index]?.width) || 0,
       height: Number(metadata[index]?.height) || 0,
       url: `${req.protocol}://${req.get("host")}/uploads/${encodeURIComponent(file.filename)}`,
-    })),
-  });
+      syncStatus: isCloudinaryConfigured() ? "pending" : "local",
+      cloudinaryPublicId: "",
+      syncError: "",
+    };
+    if (isCloudinaryConfigured()) {
+      try {
+        const cloud = await uploadMediaAsset({ filePath: file.path, publicId: asset.id });
+        asset.url = cloud.url;
+        asset.cloudinaryPublicId = cloud.cloudinaryPublicId;
+        asset.syncStatus = "synced";
+      } catch (error) {
+        asset.syncStatus = "failed";
+        asset.syncError = error.message || "Cloudinary upload failed.";
+      }
+    }
+    assets.push(asset);
+  }
+  res.status(201).json({ assets });
+};
+
+export const retryAssetUpload = async (req, res, next) => {
+  try {
+    if (!isCloudinaryConfigured()) {
+      return res.status(503).json({ error: "Cloudinary is not configured." });
+    }
+    const project = await Project.findOne({
+      _id: req.params.projectId,
+      ownerId: req.clerkUserId,
+    });
+    if (!project) return res.status(404).json({ error: "Project not found." });
+    const asset = project.assets.find((item) => item.id === req.params.assetId);
+    if (!asset) return res.status(404).json({ error: "Media asset not found." });
+    const result = await syncProjectAsset(project, asset);
+    if (result.status === "syncing") return res.status(202).json({ asset, status: "syncing" });
+    if (result.status === "failed") return res.status(502).json({ error: result.asset.syncError, asset });
+    return res.json({ asset });
+  } catch (error) {
+    next(error);
+  }
 };
